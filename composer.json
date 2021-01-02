@@ -1,0 +1,12 @@
+{
+    "name": "melaraby/emerald",
+    "description": "The Emerald Helper Package",
+    "authors": [
+        {
+            "name": "Mohammed Elaraby",
+            "email": "mohammed.elaraby@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
