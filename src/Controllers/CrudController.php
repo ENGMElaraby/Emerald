@@ -3,15 +3,16 @@
 namespace MElaraby\Emerald\Controllers;
 
 use App\Http\Controllers\Controller;
-use MElaraby\{Emerald\Repositories\RepositoryContract,
-    Emerald\Resources\ResourceCollections,
-    Emerald\Responses\GeneralResponse,
-    Emerald\RestfulAPI\RestTrait
-    };
+use BadMethodCallException;
+use Error;
+use MElaraby\{Emerald\Breadcrumbs\Breadcrumb,
+    Emerald\Repositories\RepositoryContract,
+    Emerald\Responses\GeneralResponse
+};
 
 class CrudController extends Controller implements CrudContract
 {
-    use RestTrait, CrudHelper;
+    use CrudHelper;
 
     protected
         /**
@@ -34,13 +35,6 @@ class CrudController extends Controller implements CrudContract
          * @var RepositoryContract
          */
         $repository,
-
-        /**
-         * determine which Response interface we use to control response in index function (Illuminate\Contracts\Support\Responsible).
-         *
-         * @var GeneralResponse
-         */
-        $Response = GeneralResponse::class,
 
         /**
          * determine which FormRequest use in store.
@@ -68,7 +62,7 @@ class CrudController extends Controller implements CrudContract
          *
          * @var string|null
          */
-        $breadcrumbs,
+        $breadcrumb,
 
         /**
          * use pagination if needed default false.
@@ -91,6 +85,7 @@ class CrudController extends Controller implements CrudContract
     public function __construct(RepositoryContract $repository)
     {
         $this->repository = $repository;
+
     }
 
     /**
@@ -100,11 +95,11 @@ class CrudController extends Controller implements CrudContract
      */
     public function index(): GeneralResponse
     {
-        return MElaraby($this->Response,[
-            'breadcrumbs'   => $this->breadcrumbs . '.index',
-            'data'          => new ResourceCollections($this->getPaginationOrAll($this->perPage), $this->theResource, $this->pagination),
-            'message'       => 'Request success, get all',
-            'view'          => $this->view . '.index']);
+        return new GeneralResponse([
+            'data' => $this->repository->index(),
+            'view' => $this->view . 'index',
+            'breadcrumbs' => new Breadcrumb($this->breadcrumb)
+        ]);
     }
 
     /**
@@ -114,10 +109,10 @@ class CrudController extends Controller implements CrudContract
      */
     public function create(): GeneralResponse
     {
-        return MElaraby($this->Response, [
-            'breadcrumbs'   => $this->breadcrumbs . '.create',
-            'data'          => (method_exists($this->repository, 'createData')) ? $this->repository->createData() : null,
-            'view'          => $this->view . '.create'
+        return new GeneralResponse([
+            'data' => $this->repository->create([]),
+            'view' => $this->view . 'create',
+            'breadcrumbs' => new Breadcrumb($this->breadcrumb)
         ]);
     }
 
@@ -128,12 +123,11 @@ class CrudController extends Controller implements CrudContract
      */
     public function store(): GeneralResponse
     {
-        $request = MElaraby($this->storeRequest);
+        $request = app($this->storeRequest);
         $this->repository->store($request->validated());
-        return MElaraby($this->Response, [
-            'message'   => 'Request success, Added new',
-            'route'     => $this->route . '.index',
-            'alert'     => ['type' => 'success', 'html' => __('admin/Modules.add_new')]
+        return new GeneralResponse([
+            'route' => $this->storeRedirect(),
+            'alert' => ['type' => 'success', 'html' => 'Added new']
         ]);
     }
 
@@ -145,11 +139,10 @@ class CrudController extends Controller implements CrudContract
      */
     public function show(int $id): GeneralResponse
     {
-        return MElaraby($this->Response, [
-            'breadcrumbs'   => $this->breadcrumbs . '.show',
-            'data'          => ((method_exists($this->repository, 'showData')) ? $this->repository->showData($this->repository->getById($id)) : null),
-            'message'       => 'Request success, get specific one',
-            'view'          => $this->view . '.show'
+        return new GeneralResponse([
+            'breadcrumbs' => new Breadcrumb($this->breadcrumb),
+            'data' => $this->repository->show($id),
+            'view' => $this->view . 'show'
         ]);
     }
 
@@ -161,10 +154,10 @@ class CrudController extends Controller implements CrudContract
      */
     public function edit(int $id): GeneralResponse
     {
-        return MElaraby($this->Response, [
-            'breadcrumbs'   => $this->breadcrumbs . '.edit',
-            'data'          => (method_exists($this->repository, 'editData')) ? $this->repository->editData($this->repository->getById($id)) : null,
-            'view'          => $this->view . '.edit'
+        return new GeneralResponse([
+            'breadcrumbs' => $this->breadcrumb,
+            'data' => $this->repository->edit($id),
+            'view' => $this->view . '.edit'
         ]);
     }
 
@@ -176,13 +169,11 @@ class CrudController extends Controller implements CrudContract
      */
     public function update(int $id): GeneralResponse
     {
-        $request = MElaraby($this->updateRequest);
-
-        return MElaraby($this->Response, [
-            'data'      => new ResourceCollections([$this->repository->update($request->validated(), $this->repository->getById($id))], $this->theResource),
-            'message'   => 'Request success, Updated',
-            'route'     => $this->route . '.index',
-            'alert'     => ['type' => 'success', 'html' => __('admin/Modules.updated')]
+        $request = app($this->updateRequest);
+        return new GeneralResponse([
+            'data' => $this->repository->update($request->validated(), $id),
+            'route' => $this->updateRedirect(),
+            'alert' => ['type' => 'success', 'html' => 'Updated one']
         ]);
     }
 
@@ -194,27 +185,57 @@ class CrudController extends Controller implements CrudContract
      */
     public function destroy(int $id): GeneralResponse
     {
-        $this->repository->deleteById($this->repository->getById($id)->id);
-        return MElaraby($this->Response, [
-            'message'   => 'Request success, Delete specified resource from storage',
-            'route'     => $this->route . '.index',
-            'alert'     => ['type' => 'success', 'html' => __('admin/Modules.delete')]
+        $this->repository->destroy($id);
+        return new GeneralResponse([
+            'message' => 'Request success, Delete specified resource from storage',
+            'route' => $this->deleteRedirect(),
+            'alert' => ['type' => 'success', 'html' => __('admin/Modules.delete')]
         ]);
     }
 
     /**
      * Change status of the specified resource from storage.
      *
-     * @param int $rowId
+     * @param int $id
      * @return GeneralResponse
      */
-    public function status(int $rowId): GeneralResponse
+    public function status(int $id): GeneralResponse
     {
-        $this->repository->status($rowId);
-        return MElaraby($this->Response, [
-            'message'   => 'Request success, status updated',
-            'route'     => $this->route . '.index',
-            'alert'     => ['type' => 'success', 'html' => __('admin/Events.done')]
+        $this->repository->status($id);
+        return new GeneralResponse([
+            'route' => $this->statusRedirect(),
+            'alert' => ['type' => 'success', 'html' => 'updated']
         ]);
+    }
+
+    /**
+     * @param string $method
+     * @param array $parameters
+     * @return mixed|string
+     */
+    public function __call($method, $parameters)
+    {
+
+        if (in_array($method, ['storeRedirect', 'updateRedirect', 'deleteRedirect', 'statusRedirect'])) {
+            return $this->homeRedirect();
+        }
+
+        try {
+            return $this->{$method}();
+        } catch (Error | BadMethodCallException $e) {
+            $pattern = '~^Call to undefined method (?P<class>[^:]+)::(?P<method>[^\(]+)\(\)$~';
+
+            if (!preg_match($pattern, $e->getMessage(), $matches)) {
+                throw $e;
+            }
+
+            if ($matches['class'] != get_class($this) || $matches['method'] != $method) {
+                throw $e;
+            }
+
+            throw new BadMethodCallException(sprintf(
+                'Call to undefined method %s::%s()', static::class, $method
+            ));
+        }
     }
 }

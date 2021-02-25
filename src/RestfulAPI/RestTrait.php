@@ -18,15 +18,4 @@ trait RestTrait
         return mb_strpos($request->url(), $request->getHost().'/api') !== false;
     }
 
-    /**
-     * Determine if request is an Admin call.
-     * If the request URI contains '/admin'.
-     *
-     * @param Request $request
-     * @return bool
-     */
-    protected function isAdminCall(Request $request): bool
-    {
-        return mb_strpos($request->url(), $request->getHost().'/admin')  !== false;
-    }
 }

@@ -2,88 +2,27 @@
 
 namespace MElaraby\Emerald\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface RepositoryContract
 {
-    /**
-     * @return mixed
-     */
     public function all();
 
-    /**
-     * @return int
-     */
-    public function count() : int;
+    public function index();
 
-    /**
-     * @return mixed
-     */
-    public function first();
+    public function create(array $data);
 
-    /**
-     * @return mixed
-     */
-    public function get();
+    public function store(array $data): void;
 
-    /**
-     * @param int $id
-     * @return mixed
-     */
-    public function getById(int $id);
+    public function show(int $id);
 
-    /**
-     * @param $item
-     * @param $column
-     * @param array $columns
-     * @return mixed
-     */
-    public function getByColumn($item, $column, array $columns = ['*']);
+    public function edit(int $id);
 
-    /**
-     * @param int $limit
-     * @return mixed
-     */
-    public function limit(int $limit);
+    public function update(array $data, $id): void;
 
-    /**
-     * @param string $column
-     * @param string $direction
-     * @return mixed
-     */
-    public function orderBy(string $column, string $direction);
+    public function destroy(int $id);
 
-    /**
-     * @param int $limit
-     * @param array|string[] $columns
-     * @param string $pageName
-     * @param null $page
-     * @return mixed
-     */
-    public function paginate(int $limit = 25, array $columns = ['*'], string $pageName = 'page', $page = null);
+    public function status(int $id);
 
-    /**
-     * @param $column
-     * @param $value
-     * @param string $operator
-     * @return mixed
-     */
-    public function where($column, $value, $operator = '=');
-
-    /**
-     * @param $column
-     * @param $value
-     * @return mixed
-     */
-    public function whereIn($column, $value);
-
-    /**
-     * @param $relations
-     * @return mixed
-     */
-    public function with($relations);
-
-    /**
-     * @param int $id
-     * @return mixed
-     */
-    public function deleteById(int $id);
+    public function find(int $id): Model;
 }

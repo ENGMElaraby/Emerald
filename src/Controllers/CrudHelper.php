@@ -3,14 +3,16 @@ namespace MElaraby\Emerald\Controllers;
 
 trait CrudHelper
 {
-    /**
-     * @param int $perPage
-     * @return mixed
-     */
-    private function getPaginationOrAll(int $perPage)
+    private function checkMethodExists()
     {
-        return ($this->pagination) ? $this->repository->paginate($perPage) : $this->repository->all();
+
     }
 
-
+    /**
+     * @return string
+     */
+    protected function homeRedirect(): string
+    {
+        return $this->route . 'index';
+    }
 }
