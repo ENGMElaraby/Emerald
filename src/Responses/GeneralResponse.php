@@ -23,7 +23,7 @@ class GeneralResponse implements Responsable, ResponsibleContract
          *
          * @var int
          */
-        $status,
+        $status = 200,
 
         /**
          * message include request
@@ -44,7 +44,7 @@ class GeneralResponse implements Responsable, ResponsibleContract
          *
          * @var array|null
          */
-        $option,
+        $option = [],
 
         /**
          * return view if web request and not api or ajax request
@@ -75,6 +75,13 @@ class GeneralResponse implements Responsable, ResponsibleContract
         $alert,
 
         /**
+         * Redirect for if redirect out/in route
+         *
+         * @var string|null
+         */
+        $redirect,
+
+        /**
          * alert use for view request only as Alarm or Alert or Notify
          *
          * @var string|null
@@ -98,7 +105,7 @@ class GeneralResponse implements Responsable, ResponsibleContract
         ],
         'status' => [
             'default' => 200,
-            'casting' => 'string'
+            'casting' => 'integer'
         ],
         'alert' => [
             'default' => null,
@@ -111,6 +118,10 @@ class GeneralResponse implements Responsable, ResponsibleContract
         'option' => [
             'default' => [],
             'casting' => 'array'
+        ],
+        'redirect' => [
+            'default' => '/',
+            'casting' => 'string'
         ],
     ];
 
@@ -125,7 +136,7 @@ class GeneralResponse implements Responsable, ResponsibleContract
         foreach ($properties as $property => $value) {
             $this->checkPropertyInProperties($property);
             $this->checkPropertyCasting($property, gettype($value));
-            $this->$property = $value;
+            $this->checkPropertyHasValueAndUpdatePropertyValue($property, $value);
         }
     }
 
@@ -161,11 +172,29 @@ class GeneralResponse implements Responsable, ResponsibleContract
     }
 
     /**
+     * @param string $property
+     * @param $value
+     * @return void
+     */
+    private function checkPropertyHasValueAndUpdatePropertyValue(string $property, $value): void
+    {
+        if (empty($value)) {
+            $this->$property = $this->properties[$property]['default'];
+        }
+
+        $this->$property = $value;
+    }
+
+    /**
      * @param Request $request
      * @return Application|Factory|View|JsonResponse|RedirectResponse|Response
      */
     public function toResponse($request)
     {
+        if (!is_null($this->redirect)) {
+            return redirect($this->redirect);
+        }
+
         if ($this->isApiCall($request) || $request->ajax() || $request->wantsJson()) {
             return response()->json($this->Data(), $this->status);
         }
@@ -187,10 +216,33 @@ class GeneralResponse implements Responsable, ResponsibleContract
      */
     public function Data(): array
     {
-        return array_merge([
+        $data = [
             'status' => $this->status,
-            'message' => $this->message,
-            'data' => $this->data,
-        ], $this->option);
+        ];
+
+        if (!is_null($this->message)) {
+            $data['message'] = $this->message;
+        }
+
+        if (!is_null($this->data)) {
+            $data['data'] = $this->data;
+        }
+
+        return array_merge($data, $this->option);
+    }
+
+    /**
+     * @param string $message
+     * @param int $status
+     * @return GeneralResponse
+     */
+    public static function error(string $message, int $status = 401): GeneralResponse
+    {
+        return new self([
+            'option' => [
+                'error' => $message,
+            ],
+            'status' => $status
+        ]);
     }
 }
