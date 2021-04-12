@@ -6,9 +6,27 @@ use Illuminate\Support\Str;
 
 trait FilesHelper
 {
+    private $fileName;
+
+    /**
+     * @param array $files
+     * @param string $location
+     * @return array
+     */
+    protected function uploadMultiFiles(array $files, string $location): array
+    {
+        $uploadedFiles = [];
+        foreach ($files as $key => $file) {
+            $uploadedFiles[$key]['url'] = $this->fileUpload($file, $location);
+            $uploadedFiles[$key]['name'] = $this->fileName;
+        }
+
+        return $uploadedFiles;
+    }
+
     /**
      * @param object $file
-     * @param $location
+     * @param string $location
      * @return string|null
      */
     protected function fileUpload(object $file, string $location): ?string
@@ -24,7 +42,7 @@ trait FilesHelper
     }
 
     /**
-     * @param $extension
+     * @param string $extension
      * @return string
      */
     private function uniqueName(string $extension): string

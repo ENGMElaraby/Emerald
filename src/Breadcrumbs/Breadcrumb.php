@@ -1,4 +1,5 @@
 <?php
+
 namespace MElaraby\Emerald\Breadcrumbs;
 
 class Breadcrumb
@@ -7,11 +8,16 @@ class Breadcrumb
 
     /**
      * Breadcrumb constructor.
-     * @param $name
+     * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct(string $name = null)
     {
         $this->name = $name;
     }
+
+//    public function __invoke()
+//    {
+//        // TODO: Implement __invoke() method.
+//    }
 
 }

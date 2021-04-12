@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use BadMethodCallException;
 use Error;
 use MElaraby\{Emerald\Breadcrumbs\Breadcrumb,
-    Emerald\Repositories\RepositoryContract,
+    Emerald\Repositories\RepositoryContractCrud,
     Emerald\Responses\GeneralResponse
 };
 
@@ -32,7 +32,7 @@ class CrudController extends Controller implements CrudContract
         /**
          * determine which repository.
          *
-         * @var RepositoryContract
+         * @var RepositoryContractCrud
          */
         $repository,
 
@@ -80,12 +80,11 @@ class CrudController extends Controller implements CrudContract
 
     /**
      * Controller constructor.
-     * @param RepositoryContract $repository
+     * @param RepositoryContractCrud $repository
      */
-    public function __construct(RepositoryContract $repository)
+    public function __construct(RepositoryContractCrud $repository)
     {
         $this->repository = $repository;
-
     }
 
     /**
@@ -97,7 +96,7 @@ class CrudController extends Controller implements CrudContract
     {
         return new GeneralResponse([
             'data' => $this->repository->index(),
-            'view' => $this->view . 'index',
+            'view' => $this->indexView(),
             'breadcrumbs' => new Breadcrumb($this->breadcrumb)
         ]);
     }
@@ -111,7 +110,7 @@ class CrudController extends Controller implements CrudContract
     {
         return new GeneralResponse([
             'data' => $this->repository->create([]),
-            'view' => $this->view . 'create',
+            'view' => $this->storeView(),
             'breadcrumbs' => new Breadcrumb($this->breadcrumb)
         ]);
     }
@@ -127,7 +126,7 @@ class CrudController extends Controller implements CrudContract
         $this->repository->store($request->validated());
         return new GeneralResponse([
             'route' => $this->storeRedirect(),
-            'alert' => ['type' => 'success', 'html' => 'Added new']
+            'alert' => $this->alert('success','Added new')
         ]);
     }
 
@@ -142,7 +141,7 @@ class CrudController extends Controller implements CrudContract
         return new GeneralResponse([
             'breadcrumbs' => new Breadcrumb($this->breadcrumb),
             'data' => $this->repository->show($id),
-            'view' => $this->view . 'show'
+            'view' => $this->showView(),
         ]);
     }
 
@@ -157,7 +156,7 @@ class CrudController extends Controller implements CrudContract
         return new GeneralResponse([
             'breadcrumbs' => $this->breadcrumb,
             'data' => $this->repository->edit($id),
-            'view' => $this->view . '.edit'
+            'view' => $this->editView(),
         ]);
     }
 
@@ -215,9 +214,13 @@ class CrudController extends Controller implements CrudContract
      */
     public function __call($method, $parameters)
     {
-
         if (in_array($method, ['storeRedirect', 'updateRedirect', 'deleteRedirect', 'statusRedirect'])) {
             return $this->homeRedirect();
+        }
+
+        if (in_array($method, ['indexView', 'storeView', 'showView', 'editView'])) {
+            $viewName = explode("View", $method, 2)[0];
+            return $this->view($viewName);
         }
 
         try {

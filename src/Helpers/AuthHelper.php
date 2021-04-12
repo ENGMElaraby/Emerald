@@ -11,7 +11,7 @@ trait AuthHelper
      * @param string|null $guard
      * @return bool
      */
-    private function checkAuth(string $guard = null) : bool
+    private function checkAuth(?string $guard = null): bool
     {
         return auth()->guard($guard)->check();
     }

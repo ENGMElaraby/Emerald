@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\Crypt;
 
 /**
- * Traits EncryptionDbAttribute
+ * Traits EncryptionDbAttribute for Models
  * @package MElaraby\Emerald\Security\DatabaseEncryption
  */
 trait EncryptionDbAttribute

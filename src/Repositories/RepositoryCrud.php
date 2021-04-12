@@ -2,9 +2,10 @@
 
 namespace MElaraby\Emerald\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
+use Exception;
+use Illuminate\{Database\Eloquent\Collection, Database\Eloquent\Model};
 
-abstract class Repository implements RepositoryContract
+abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContractHelper
 {
     /**
      * @var Model
@@ -23,11 +24,11 @@ abstract class Repository implements RepositoryContract
 
     /**
      * @param string[] $columns
-     * @return \Illuminate\Database\Eloquent\Collection|Model[]
+     * @return Collection|Model[]
      */
     public function all($columns = ['*'])
     {
-        return $this->model::all($columns);
+        return $this->model->all($columns);
     }
 
     /**
@@ -50,7 +51,7 @@ abstract class Repository implements RepositoryContract
     /**
      * @param array $data
      */
-    public function store(array $data): void
+    public function store(array $data)
     {
         $this->model::create($data);
     }
@@ -90,7 +91,7 @@ abstract class Repository implements RepositoryContract
 
     /**
      * @param int $id
-     * @throws \Exception
+     * @throws Exception
      */
     public function destroy(int $id): void
     {

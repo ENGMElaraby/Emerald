@@ -1,7 +1,7 @@
 <?php
 namespace MElaraby\Emerald\Helpers;
 
-use MElaraby\{Models\User, Services\PushNotification\Google\Firebase};
+use MElaraby\{Services\PushNotification\Google\Firebase};
 use Illuminate\Support\Facades\Notification;
 
 trait NotificationHelper
@@ -18,7 +18,7 @@ trait NotificationHelper
      */
     private function sendMobileNotification(?string $token, string $body, string $firebaseKey = null, string $title = null, string $image = null, $data = null): void
     {
-        (new Firebase)->sendNotification($token, !empty($title) ? $title : config('MElaraby.name') , $body, $image, $data);
+        (new Firebase())->sendNotification($token, !empty($title) ? $title : config('app.name') , $body, $image, $data);
     }
 
     /**

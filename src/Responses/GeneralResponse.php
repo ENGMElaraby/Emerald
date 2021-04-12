@@ -8,12 +8,13 @@ use Illuminate\{Contracts\Foundation\Application,
     Contracts\View\View,
     Http\JsonResponse,
     Http\RedirectResponse,
-    Http\Request};
+    Http\Request
+};
 use MElaraby\Emerald\RestfulAPI\RestTrait;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
-class GeneralResponse implements Responsable, ResponsibleContract
+class GeneralResponse implements Responsable
 {
     use RestTrait;
 
@@ -155,7 +156,7 @@ class GeneralResponse implements Responsable, ResponsibleContract
 
     /**
      * @param string $property
-     * @param $type
+     * @param string $type
      * @return bool
      */
     private function checkPropertyCasting(string $property, string $type): bool
@@ -186,26 +187,42 @@ class GeneralResponse implements Responsable, ResponsibleContract
     }
 
     /**
+     * @param string $message
+     * @param int $status
+     * @return GeneralResponse
+     */
+    public static function error(string $message, int $status = 401): self
+    {
+        return new self([
+            'option' => [
+                'error' => $message,
+            ],
+            'status' => $status
+        ]);
+    }
+
+    /**
      * @param Request $request
      * @return Application|Factory|View|JsonResponse|RedirectResponse|Response
      */
     public function toResponse($request)
     {
         if (!is_null($this->redirect)) {
-            return redirect($this->redirect);
+            return redirect($this->redirect)
+                ->with('data', $this->data())
+                ->with('alert', $this->alert);
         }
 
         if ($this->isApiCall($request) || $request->ajax() || $request->wantsJson()) {
-            return response()->json($this->Data(), $this->status);
+            return response()->json($this->data(), $this->status);
         }
 
         if ($this->route !== null) {
-            return redirect()->route($this->route)->with('alert', $this->alert)->with('data', $this->Data())->send();
+            return redirect()->route($this->route)->with('alert', $this->alert)->with('data', $this->data())->send();
         }
 
         return view($this->view)
-            ->with('data', $this->data)
-            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('data', $this->data())
             ->with('alert', $this->alert);
     }
 
@@ -214,11 +231,9 @@ class GeneralResponse implements Responsable, ResponsibleContract
      *
      * @return array
      */
-    public function Data(): array
+    private function data(): array
     {
-        $data = [
-            'status' => $this->status,
-        ];
+        $data = ['status' => $this->status];
 
         if (!is_null($this->message)) {
             $data['message'] = $this->message;
@@ -229,20 +244,5 @@ class GeneralResponse implements Responsable, ResponsibleContract
         }
 
         return array_merge($data, $this->option);
-    }
-
-    /**
-     * @param string $message
-     * @param int $status
-     * @return GeneralResponse
-     */
-    public static function error(string $message, int $status = 401): GeneralResponse
-    {
-        return new self([
-            'option' => [
-                'error' => $message,
-            ],
-            'status' => $status
-        ]);
     }
 }
