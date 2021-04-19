@@ -10,9 +10,9 @@ use MElaraby\{Emerald\Breadcrumbs\Breadcrumb,
     Emerald\Responses\GeneralResponse
 };
 
-class CrudController extends Controller implements CrudContract
+class CrudControllerController extends Controller implements CrudControllerContract
 {
-    use CrudHelper;
+    use CrudControllerHelper;
 
     protected
         /**
@@ -126,7 +126,7 @@ class CrudController extends Controller implements CrudContract
         $this->repository->store($request->validated());
         return new GeneralResponse([
             'route' => $this->storeRedirect(),
-            'alert' => $this->alert('success','Added new')
+            'alert' => $this->storeAlert('success','Added new')
         ]);
     }
 
@@ -172,7 +172,7 @@ class CrudController extends Controller implements CrudContract
         return new GeneralResponse([
             'data' => $this->repository->update($request->validated(), $id),
             'route' => $this->updateRedirect(),
-            'alert' => $this->alert('success','Updated one')
+            'alert' => $this->updateAlert('success','Updated one')
         ]);
     }
 
@@ -186,9 +186,8 @@ class CrudController extends Controller implements CrudContract
     {
         $this->repository->destroy($id);
         return new GeneralResponse([
-            'message' => 'Request success, Delete specified resource from storage',
             'route' => $this->deleteRedirect(),
-            'alert' => $this->alert('success','Deleted')
+            'alert' => $this->destroyAlert('success','Deleted')
         ]);
     }
 
@@ -203,7 +202,7 @@ class CrudController extends Controller implements CrudContract
         $this->repository->status($id);
         return new GeneralResponse([
             'route' => $this->statusRedirect(),
-            'alert' => $this->alert('success','updated')
+            'alert' => $this->statusAlert('success','updated')
         ]);
     }
 
@@ -216,6 +215,10 @@ class CrudController extends Controller implements CrudContract
     {
         if (in_array($method, ['storeRedirect', 'updateRedirect', 'deleteRedirect', 'statusRedirect'])) {
             return $this->homeRedirect();
+        }
+
+        if (in_array($method, ['storeAlert', 'updateAlert', 'destroyAlert', 'statusAlert'])) {
+            return $this->alert($parameters[0], $parameters[1]);
         }
 
         if (in_array($method, ['indexView', 'storeView', 'showView', 'editView'])) {

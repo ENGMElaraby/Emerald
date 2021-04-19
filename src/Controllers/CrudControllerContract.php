@@ -4,7 +4,7 @@ namespace MElaraby\Emerald\Controllers;
 
 use MElaraby\Emerald\Responses\GeneralResponse;
 
-interface CrudContract
+interface CrudControllerContract
 {
     /**
      * Display a listing of the resource.

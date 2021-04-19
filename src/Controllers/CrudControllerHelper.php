@@ -2,13 +2,8 @@
 
 namespace MElaraby\Emerald\Controllers;
 
-trait CrudHelper
+trait CrudControllerHelper
 {
-    private function checkMethodExists()
-    {
-
-    }
-
     /**
      * @return string
      */

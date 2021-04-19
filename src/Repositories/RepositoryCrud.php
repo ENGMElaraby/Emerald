@@ -4,6 +4,8 @@ namespace MElaraby\Emerald\Repositories;
 
 use Exception;
 use Illuminate\{Database\Eloquent\Collection, Database\Eloquent\Model};
+use ReflectionClass;
+use ReflectionException;
 
 abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContractHelper
 {
@@ -23,12 +25,18 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
     }
 
     /**
-     * @param string[] $columns
-     * @return Collection|Model[]
+     * @return mixed
+     * @throws Exception
      */
-    public function all($columns = ['*'])
+    public static function getInstance()
     {
-        return $this->model->all($columns);
+        try {
+            $class = get_called_class();
+            $parameter = (new ReflectionClass($class))->getConstructor()->getParameters()[0]->getClass()->getName();
+            return (new $class(new $parameter));
+        } catch (ReflectionException $e) {
+            throw new Exception('Failed to make instance, ' . $e->getMessage());
+        }
     }
 
     /**
@@ -37,6 +45,15 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
     public function index()
     {
         return $this->all(['*']);
+    }
+
+    /**
+     * @param string[] $columns
+     * @return Collection|Model[]
+     */
+    public function all($columns = ['*'])
+    {
+        return $this->model->all($columns);
     }
 
     /**
@@ -69,24 +86,18 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
      * @param int $id
      * @return Model
      */
-    public function edit(int $id)
+    public function find(int $id): Model
     {
-        return $this->find($id);
+        return $this->model::find($id);
     }
 
     /**
-     * @param array $data
-     * @param int|Model $id
+     * @param int $id
+     * @return Model
      */
-    public function update(array $data, $id): void
+    public function edit(int $id)
     {
-        if ($id instanceof Model) {
-            $model = $id;
-        } else {
-            $model = $this->find($id);
-        }
-
-        $model->update($data);
+        return $this->find($id);
     }
 
     /**
@@ -111,11 +122,17 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
     }
 
     /**
-     * @param int $id
-     * @return Model
+     * @param array $data
+     * @param int|Model $id
      */
-    public function find(int $id): Model
+    public function update(array $data, $id): void
     {
-        return $this->model::find($id);
+        if ($id instanceof Model) {
+            $model = $id;
+        } else {
+            $model = $this->find($id);
+        }
+
+        $model->update($data);
     }
 }
