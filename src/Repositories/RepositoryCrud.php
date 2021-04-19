@@ -106,7 +106,7 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
     {
         $model = $this->find($id);
         $this->update([
-            'status' => ((bool)$model->status ? false : true)
+            'status' => ((bool)$model->status)
         ], $model);
     }
 

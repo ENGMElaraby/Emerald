@@ -63,8 +63,8 @@ interface CrudContract
     /**
      * Change status of the specified resource from storage.
      *
-     * @param int $rowId
+     * @param int $id
      * @return GeneralResponse
      */
-    public function status(int $rowId): GeneralResponse;
+    public function status(int $id): GeneralResponse;
 }

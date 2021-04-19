@@ -172,7 +172,7 @@ class CrudController extends Controller implements CrudContract
         return new GeneralResponse([
             'data' => $this->repository->update($request->validated(), $id),
             'route' => $this->updateRedirect(),
-            'alert' => ['type' => 'success', 'html' => 'Updated one']
+            'alert' => $this->alert('success','Updated one')
         ]);
     }
 
@@ -188,7 +188,7 @@ class CrudController extends Controller implements CrudContract
         return new GeneralResponse([
             'message' => 'Request success, Delete specified resource from storage',
             'route' => $this->deleteRedirect(),
-            'alert' => ['type' => 'success', 'html' => __('admin/Modules.delete')]
+            'alert' => $this->alert('success','Deleted')
         ]);
     }
 
@@ -203,7 +203,7 @@ class CrudController extends Controller implements CrudContract
         $this->repository->status($id);
         return new GeneralResponse([
             'route' => $this->statusRedirect(),
-            'alert' => ['type' => 'success', 'html' => 'updated']
+            'alert' => $this->alert('success','updated')
         ]);
     }
 
