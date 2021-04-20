@@ -1,6 +1,6 @@
 <?php
 
-namespace MElaraby\Emerald\Repositories;
+namespace MElaraby\Emerald\Repositories\Interfaces;
 
 interface RepositoryContractCrud
 {
@@ -45,4 +45,10 @@ interface RepositoryContractCrud
      * @return mixed
      */
     public function destroy(int $id);
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public function status(int $id);
 }

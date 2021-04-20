@@ -2,58 +2,28 @@
 
 namespace MElaraby\Emerald\Repositories;
 
+use MElaraby\Emerald\Repositories\Interfaces\RepositoryContractCrud;
 use Exception;
 use Illuminate\{Database\Eloquent\Collection, Database\Eloquent\Model};
-use ReflectionClass;
-use ReflectionException;
 
-abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContractHelper
+abstract class RepositoryCrud extends Repository implements RepositoryContractCrud
 {
     /**
-     * @var Model
-     */
-    protected $model;
-
-    /**
-     * BaseRepository constructor.
+     * CrudRepository constructor.
      *
      * @param Model $model
      */
     public function __construct(Model $model)
     {
-        $this->model = $model;
+        parent::__construct($model);
     }
 
     /**
-     * @return mixed
-     * @throws Exception
-     */
-    public static function getInstance()
-    {
-        try {
-            $class = get_called_class();
-            $parameter = (new ReflectionClass($class))->getConstructor()->getParameters()[0]->getClass()->getName();
-            return (new $class(new $parameter));
-        } catch (ReflectionException $e) {
-            throw new Exception('Failed to make instance, ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * @return mixed
+     * @return Collection|Model[]|mixed
      */
     public function index()
     {
         return $this->all(['*']);
-    }
-
-    /**
-     * @param string[] $columns
-     * @return Collection|Model[]
-     */
-    public function all($columns = ['*'])
-    {
-        return $this->model->all($columns);
     }
 
     /**
@@ -67,6 +37,7 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
 
     /**
      * @param array $data
+     * @return mixed
      */
     public function store(array $data)
     {
@@ -75,7 +46,7 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
 
     /**
      * @param int $id
-     * @return Model
+     * @return Model|mixed
      */
     public function show(int $id)
     {
@@ -84,16 +55,7 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
 
     /**
      * @param int $id
-     * @return Model
-     */
-    public function find(int $id): Model
-    {
-        return $this->model::find($id);
-    }
-
-    /**
-     * @param int $id
-     * @return Model
+     * @return Model|mixed
      */
     public function edit(int $id)
     {
@@ -117,7 +79,7 @@ abstract class RepositoryCrud implements RepositoryContractCrud, RepositoryContr
     {
         $model = $this->find($id);
         $this->update([
-            'status' => ((bool)$model->status)
+            'status' => (bool)$model->status
         ], $model);
     }
 
