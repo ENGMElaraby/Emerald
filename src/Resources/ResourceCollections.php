@@ -29,11 +29,14 @@ class ResourceCollections extends ResourceCollection
      * Transform the resource collection into an array.
      *
      * @param Request $request
-     * @return array
+     * @return Collection
      */
-    public function toArray($request)
+    public function toArray($request): Collection
     {
-        $collection = ($this->pagination) ? ['rows' => $this->theResource::collection($this->collection)] : $this->theResource::collection($this->collection);
+        $collection = $this->collection;
+        if (!is_null($this->theResource)) {
+            $collection = ($this->pagination) ? ['rows' => $this->theResource::collection($collection)] : $this->theResource::collection($collection);
+        }
         return $this->merges(new Collection($collection));
 
     }
@@ -41,10 +44,10 @@ class ResourceCollections extends ResourceCollection
     /**
      * Merge all Function as Array then return
      *
-     * @param $data
-     * @return mixed
+     * @param Collection $data
+     * @return Collection
      */
-    private function merges($data)
+    private function merges(Collection $data): Collection
     {
         if ($this->pagination) {
             $data = $data->merge($this->pagination());
@@ -55,7 +58,7 @@ class ResourceCollections extends ResourceCollection
     /**
      * @return Collection
      */
-    private function pagination()
+    private function pagination(): Collection
     {
         return new Collection([
             'pagination' => [

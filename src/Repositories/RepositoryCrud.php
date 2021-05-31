@@ -5,6 +5,7 @@ namespace MElaraby\Emerald\Repositories;
 use MElaraby\Emerald\Repositories\Interfaces\RepositoryContractCrud;
 use Exception;
 use Illuminate\{Database\Eloquent\Collection, Database\Eloquent\Model};
+use http\Exception\RuntimeException;
 
 abstract class RepositoryCrud extends Repository implements RepositoryContractCrud
 {
@@ -19,11 +20,21 @@ abstract class RepositoryCrud extends Repository implements RepositoryContractCr
     }
 
     /**
+     * @param bool $pagination
+     * @param int $perPage
      * @return Collection|Model[]|mixed
      */
-    public function index()
+    public function index(bool $pagination = false, int $perPage = 6)
     {
-        return $this->all(['*']);
+        $this->newQuery()->eagerLoad()->setClauses();
+
+        $model = $this->query;
+
+        if ($pagination) {
+            return $model->paginate($perPage);
+        }
+
+        return $model->get(['*']);
     }
 
     /**
@@ -37,7 +48,7 @@ abstract class RepositoryCrud extends Repository implements RepositoryContractCr
 
     /**
      * @param array $data
-     * @return mixed
+     * @return void
      */
     public function store(array $data)
     {
@@ -46,7 +57,7 @@ abstract class RepositoryCrud extends Repository implements RepositoryContractCr
 
     /**
      * @param int $id
-     * @return Model|mixed
+     * @return Model
      */
     public function show(int $id)
     {
@@ -55,32 +66,11 @@ abstract class RepositoryCrud extends Repository implements RepositoryContractCr
 
     /**
      * @param int $id
-     * @return Model|mixed
+     * @return Model
      */
     public function edit(int $id)
     {
         return $this->find($id);
-    }
-
-    /**
-     * @param int $id
-     * @throws Exception
-     */
-    public function destroy(int $id): void
-    {
-        $model = $this->find($id);
-        $model->delete();
-    }
-
-    /**
-     * @param int $id
-     */
-    public function status(int $id): void
-    {
-        $model = $this->find($id);
-        $this->update([
-            'status' => (bool)$model->status
-        ], $model);
     }
 
     /**
@@ -96,5 +86,30 @@ abstract class RepositoryCrud extends Repository implements RepositoryContractCr
         }
 
         $model->update($data);
+    }
+
+    /**
+     * @param int $id
+     * @throws Exception
+     */
+    public function destroy(int $id): void
+    {
+        $model = $this->find($id);
+        if ($model) {
+            $model->delete();
+            return;
+        }
+        throw new \RuntimeException('Not found resource');
+    }
+
+    /**
+     * @param int $id
+     */
+    public function status(int $id): void
+    {
+        $model = $this->find($id);
+        $this->update([
+            'status' => (bool)$model->status
+        ], $model);
     }
 }

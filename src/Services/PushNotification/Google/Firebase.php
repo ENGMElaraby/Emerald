@@ -1,6 +1,6 @@
 <?php
 
-namespace MElaraby\Services\PushNotification\Google;
+namespace App\Packages\Services\PushNotification\Google;
 
 class Firebase
 {

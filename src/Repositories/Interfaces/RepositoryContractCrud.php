@@ -5,9 +5,11 @@ namespace MElaraby\Emerald\Repositories\Interfaces;
 interface RepositoryContractCrud
 {
     /**
+     * @param bool $pagination
+     * @param int $perPage
      * @return mixed
      */
-    public function index();
+    public function index(bool $pagination, int $perPage);
 
     /**
      * @param array $data

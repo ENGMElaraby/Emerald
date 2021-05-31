@@ -1,8 +1,6 @@
 <?php
 namespace MElaraby\Emerald\Resources;
 
-use Illuminate\Support\Collection;
-
 trait ResourceHelper
 {
     private

@@ -9,7 +9,7 @@ trait CrudControllerHelper
      */
     private function homeRedirect(): string
     {
-        return $this->route . 'index';
+        return route($this->route . 'index');
     }
 
     /**
@@ -29,5 +29,10 @@ trait CrudControllerHelper
     private function alert(string $type, string $html): array
     {
         return ['type' => $type, 'html' => $html];
+    }
+
+    private function getValidatedData()
+    {
+
     }
 }

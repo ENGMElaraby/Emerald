@@ -2,7 +2,7 @@
 
 namespace MElaraby\Emerald\Helpers;
 
-use Illuminate\Support\Str;
+use Illuminate\{Support\Facades\Storage, Support\Str};
 
 trait FilesHelper
 {
@@ -29,7 +29,7 @@ trait FilesHelper
      * @param string $location
      * @return string|null
      */
-    protected function fileUpload(object $file, string $location): ?string
+    protected function fileUpload(object $file, string $location, ?string $disk = 'null'): ?string
     {
         if (!is_file($file)) {
             return null;
@@ -37,7 +37,13 @@ trait FilesHelper
 
         $fileOriginalExtension = $file->getClientOriginalExtension();
         $fileUniqueName = $this->uniqueName($fileOriginalExtension);
-        $file->storeAs('public/uploads/' . $location, $fileUniqueName);
+
+        if ($disk) {
+            $uploadedFile = Storage::disk('public_uploads')->put($location, $file);
+            return url()->to('uploads/' . $uploadedFile);
+        }
+
+        $file->storeAs('public/uploads/' . $location, $fileUniqueName, ['disk' => 'public_uploads']);
         return url()->to('/storage/uploads/' . $location . '/' . $fileUniqueName);
     }
 

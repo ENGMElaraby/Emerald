@@ -2,14 +2,18 @@
 
 namespace MElaraby\Emerald\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\{Http\Controllers\Controller,
+    Packages\Emerald\Repositories\Interfaces\RepositoryContractCrud,
+    Packages\Emerald\Responses\GeneralResponse};
 use BadMethodCallException;
 use Error;
-use MElaraby\{Emerald\Breadcrumbs\Breadcrumb,
-    Emerald\Repositories\RepositoryContractCrud,
-    Emerald\Responses\GeneralResponse
-};
 
+/**
+ * @TODO add permission (class, pattern, trait)
+ *
+ * Class CrudControllerController
+ * @package MElaraby\Emerald\Controllers
+ */
 class CrudControllerController extends Controller implements CrudControllerContract
 {
     use CrudControllerHelper;
@@ -58,13 +62,6 @@ class CrudControllerController extends Controller implements CrudControllerContr
         $theResource,
 
         /**
-         * determine the Breadcrumbs use it.
-         *
-         * @var string|null
-         */
-        $breadcrumb,
-
-        /**
          * use pagination if needed default false.
          *
          * @var bool
@@ -95,9 +92,8 @@ class CrudControllerController extends Controller implements CrudControllerContr
     public function index(): GeneralResponse
     {
         return new GeneralResponse([
-            'data' => $this->repository->index(),
+            'data' => $this->repository->index($this->pagination, $this->perPage),
             'view' => $this->indexView(),
-            'breadcrumbs' => new Breadcrumb($this->breadcrumb)
         ]);
     }
 
@@ -111,7 +107,6 @@ class CrudControllerController extends Controller implements CrudControllerContr
         return new GeneralResponse([
             'data' => $this->repository->create([]),
             'view' => $this->storeView(),
-            'breadcrumbs' => new Breadcrumb($this->breadcrumb)
         ]);
     }
 
@@ -125,8 +120,8 @@ class CrudControllerController extends Controller implements CrudControllerContr
         $request = app($this->storeRequest);
         $this->repository->store($request->validated());
         return new GeneralResponse([
-            'route' => $this->storeRedirect(),
-            'alert' => $this->storeAlert('success','Added new')
+            'redirect' => $this->storeRedirect(),
+            'alert' => $this->storeAlert('success', 'Added new')
         ]);
     }
 
@@ -139,7 +134,6 @@ class CrudControllerController extends Controller implements CrudControllerContr
     public function show(int $id): GeneralResponse
     {
         return new GeneralResponse([
-            'breadcrumbs' => new Breadcrumb($this->breadcrumb),
             'data' => $this->repository->show($id),
             'view' => $this->showView(),
         ]);
@@ -154,7 +148,6 @@ class CrudControllerController extends Controller implements CrudControllerContr
     public function edit(int $id): GeneralResponse
     {
         return new GeneralResponse([
-            'breadcrumbs' => $this->breadcrumb,
             'data' => $this->repository->edit($id),
             'view' => $this->editView(),
         ]);
@@ -171,8 +164,8 @@ class CrudControllerController extends Controller implements CrudControllerContr
         $request = app($this->updateRequest);
         return new GeneralResponse([
             'data' => $this->repository->update($request->validated(), $id),
-            'route' => $this->updateRedirect(),
-            'alert' => $this->updateAlert('success','Updated one')
+            'redirect' => $this->updateRedirect($id),
+            'alert' => $this->updateAlert('success', 'Updated one')
         ]);
     }
 
@@ -186,8 +179,8 @@ class CrudControllerController extends Controller implements CrudControllerContr
     {
         $this->repository->destroy($id);
         return new GeneralResponse([
-            'route' => $this->deleteRedirect(),
-            'alert' => $this->destroyAlert('success','Deleted')
+            'redirect' => $this->deleteRedirect(),
+            'alert' => $this->destroyAlert('success', 'Deleted')
         ]);
     }
 
@@ -202,7 +195,7 @@ class CrudControllerController extends Controller implements CrudControllerContr
         $this->repository->status($id);
         return new GeneralResponse([
             'route' => $this->statusRedirect(),
-            'alert' => $this->statusAlert('success','updated')
+            'alert' => $this->statusAlert('success', 'updated')
         ]);
     }
 

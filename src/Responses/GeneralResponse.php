@@ -2,21 +2,21 @@
 
 namespace MElaraby\Emerald\Responses;
 
+use MElaraby\Emerald\RestfulAPI\RestTrait;
 use Illuminate\{Contracts\Foundation\Application,
     Contracts\Support\Responsable,
     Contracts\View\Factory,
     Contracts\View\View,
     Http\JsonResponse,
     Http\RedirectResponse,
-    Http\Request
-};
-use MElaraby\Emerald\RestfulAPI\RestTrait;
+    Http\Request,
+    Validation\ValidationException};
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
 class GeneralResponse implements Responsable
 {
-    use RestTrait;
+    use RestTrait, ResponseHTTPStatus;
 
     public
         /**
@@ -31,7 +31,7 @@ class GeneralResponse implements Responsable
          *
          * @var string|null
          */
-        $message,
+        $message, $userMessage,
 
         /**
          * data return into request
@@ -101,6 +101,10 @@ class GeneralResponse implements Responsable
             'casting' => 'object'
         ],
         'message' => [
+            'default' => '',
+            'casting' => 'string'
+        ],
+        'userMessage' => [
             'default' => '',
             'casting' => 'string'
         ],
@@ -189,7 +193,7 @@ class GeneralResponse implements Responsable
     /**
      * @param string $message
      * @param int $status
-     * @return GeneralResponse
+     * @return self
      */
     public static function error(string $message, int $status = 401): self
     {
@@ -199,6 +203,37 @@ class GeneralResponse implements Responsable
             ],
             'status' => $status
         ]);
+    }
+
+    /**
+     * @param string $message
+     * @param int $code
+     * @throws RuntimeException
+     */
+    public static function exceptionError(string $message, int $code = 400)
+    {
+        throw new RuntimeException($message, $code);
+    }
+
+    /**
+     * @param string $key
+     * @param string $message
+     * @throws ValidationException
+     */
+    public static function exceptionValidationError(string $key, string $message)
+    {
+        throw ValidationException::withMessages([
+            $key => [$message],
+        ]);
+    }
+
+    /**
+     * @param array $properties
+     * @return self
+     */
+    public static function response(array $properties): self
+    {
+        return new self($properties);
     }
 
     /**
@@ -222,7 +257,7 @@ class GeneralResponse implements Responsable
         }
 
         return view($this->view)
-            ->with('data', $this->data())
+            ->with('data', $this->data)
             ->with('alert', $this->alert);
     }
 
@@ -238,6 +273,12 @@ class GeneralResponse implements Responsable
         if (!is_null($this->message)) {
             $data['message'] = $this->message;
         }
+
+        if (!is_null($this->userMessage)) {
+            $data['user_message'] = $this->userMessage;
+        }
+
+        $data['hash'] = null; // TODO make Cache Class
 
         if (!is_null($this->data)) {
             $data['data'] = $this->data;

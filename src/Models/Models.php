@@ -2,8 +2,7 @@
 
 namespace MElaraby\Emerald\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\{Database\Eloquent\Factories\HasFactory, Database\Eloquent\Model};
 
 class Models extends Model
 {

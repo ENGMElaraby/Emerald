@@ -1,7 +1,7 @@
 <?php
 namespace MElaraby\Emerald\Helpers;
 
-use MElaraby\{Services\PushNotification\Google\Firebase};
+use App\Packages\{Services\PushNotification\Google\Firebase};
 use Illuminate\Support\Facades\Notification;
 
 trait NotificationHelper

@@ -3,8 +3,8 @@
 namespace MElaraby\Emerald\RestfulAPI;
 
 use App\Http\Controllers\Controller;
-use MElaraby\{Emerald\Controllers\CrudControllerHelper,
-    Emerald\Repositories\RepositoryContractCrud,
+use App\Packages\{Emerald\Controllers\CrudControllerHelper,
+    Emerald\Repositories\Interfaces\RepositoryContractCrud,
     Emerald\Resources\ResourceCollections,
     Emerald\Responses\GeneralResponse};
 
@@ -54,7 +54,12 @@ class ResourceController extends Controller implements ResourceControllerContrac
          *
          * @var string|null
          */
-        $perPage = 6;
+        $perPage = 6,
+
+        /**
+         * @var int|null
+         */
+        $userId;
 
     /**
      * Controller constructor.
@@ -63,9 +68,12 @@ class ResourceController extends Controller implements ResourceControllerContrac
     public function __construct(RepositoryContractCrud $repository)
     {
         $this->repository = $repository;
+
         if ($this->pagination && empty($this->theResource)) {
             throw new \InvalidArgumentException('Please declare and specify the resource');
         }
+
+        $this->userId = auth('sanctum')->user()->id ?? null;
     }
 
     /**
@@ -106,7 +114,7 @@ class ResourceController extends Controller implements ResourceControllerContrac
         $request = app($this->updateRequest);
         return new GeneralResponse([
             'data' => $this->repository->update($request->validated(), $id),
-            'alert' => ['type' => 'success', 'html' => 'Updated one']
+            'message' => 'updated successfully',
         ]);
     }
 
@@ -121,7 +129,6 @@ class ResourceController extends Controller implements ResourceControllerContrac
         $this->repository->destroy($id);
         return new GeneralResponse([
             'message' => 'Request success, Delete specified resource from storage',
-            'alert' => ['type' => 'success', 'html' => __('admin/Modules.delete')]
         ]);
     }
 
@@ -135,7 +142,7 @@ class ResourceController extends Controller implements ResourceControllerContrac
     {
         $this->repository->status($id);
         return new GeneralResponse([
-            'alert' => ['type' => 'success', 'html' => 'updated']
+            'message' => 'Updated successfully',
         ]);
     }
 }
