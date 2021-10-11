@@ -2,35 +2,35 @@
 
 namespace MElaraby\Emerald\RestfulAPI;
 
-use MElaraby\Emerald\Responses\GeneralResponse;
+use MElaraby\Emerald\Responses\Response;
 
 interface ResourceControllerContract
 {
     /**
-     * @return GeneralResponse
+     * @return Response
      */
-    public function index(): GeneralResponse;
+    public function index(): Response;
 
     /**
-     * @return GeneralResponse
+     * @return Response
      */
-    public function store(): GeneralResponse;
-
-    /**
-     * @param int $id
-     * @return GeneralResponse
-     */
-    public function update(int $id): GeneralResponse;
+    public function store(): Response;
 
     /**
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function destroy(int $id): GeneralResponse;
+    public function update(int $id): Response;
 
     /**
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function status(int $id): GeneralResponse;
+    public function destroy(int $id): Response;
+
+    /**
+     * @param int $id
+     * @return Response
+     */
+    public function status(int $id): Response;
 }

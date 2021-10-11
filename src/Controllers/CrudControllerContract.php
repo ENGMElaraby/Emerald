@@ -2,69 +2,69 @@
 
 namespace MElaraby\Emerald\Controllers;
 
-use MElaraby\Emerald\Responses\GeneralResponse;
+use MElaraby\Emerald\Responses\Response;
 
 interface CrudControllerContract
 {
     /**
      * Display a listing of the resource.
      *
-     * @return GeneralResponse
+     * @return Response
      */
-    public function index() : GeneralResponse;
+    public function index() : Response;
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return GeneralResponse
+     * @return Response
      */
-    public function create() : GeneralResponse;
+    public function create() : Response;
 
     /**
      * Store a newly created resource in storage.
      *
-     * @return GeneralResponse
+     * @return Response
      */
-    public function store() : GeneralResponse;
+    public function store() : Response;
 
     /**
      * Display the specified resource.
      *
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function show(int $id) : GeneralResponse;
+    public function show(int $id) : Response;
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function edit(int $id) : GeneralResponse;
+    public function edit(int $id) : Response;
 
     /**
      * Update the specified resource in storage.
      *
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function update(int $id) : GeneralResponse;
+    public function update(int $id) : Response;
 
 
     /**
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function destroy(int $id) : GeneralResponse;
+    public function destroy(int $id) : Response;
 
     /**
      * Change status of the specified resource from storage.
      *
      * @param int $id
-     * @return GeneralResponse
+     * @return Response
      */
-    public function status(int $id): GeneralResponse;
+    public function status(int $id): Response;
 }

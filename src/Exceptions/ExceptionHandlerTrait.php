@@ -2,7 +2,7 @@
 
 namespace MElaraby\Emerald\Exceptions;
 
-use MElaraby\Emerald\Responses\GeneralResponse;
+use MElaraby\Emerald\Responses\Response;
 use Illuminate\{Auth\AuthenticationException,
     Contracts\Foundation\Application,
     Database\Eloquent\ModelNotFoundException,
@@ -24,7 +24,7 @@ trait ExceptionHandlerTrait
     /**
      * @param Request $request
      * @param Throwable $exception
-     * @return GeneralResponse|Application|mixed
+     * @return Response|Application|mixed
      */
     protected function getJsonResponseForException(Request $request, Throwable $exception)
     {
@@ -131,7 +131,7 @@ trait ExceptionHandlerTrait
     /**
      * @param Request $request
      * @param Throwable $exception
-     * @return GeneralResponse|Application|mixed
+     * @return Response|Application|mixed
      */
     protected function getHTTPResponseForException(Request $request, Throwable $exception)
     {

@@ -1,16 +1,31 @@
 <?php
 
 
-namespace MElaraby\Emerald\Responses;
+namespace MElaraby\Emerald\HttpFoundation;
 
 use Illuminate\{Contracts\Foundation\Application,
     Contracts\Routing\ResponseFactory,
     Http\Resources\Json\JsonResource,
     Http\Response
 };
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 trait ResponseHTTPStatus
 {
+    /**
+     * @param string $content
+     * @param array $headers
+     * @return Application|ResponseFactory|Response
+     */
+    private function ok(string $content = '', array $headers = []): Response|Application|ResponseFactory
+    {
+        return response(
+            $this->processContent($content),
+            SymfonyResponse::HTTP_OK,
+            $headers
+        );
+    }
+
     /**
      * @param $content
      * @return string
@@ -29,22 +44,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function ok(string $content = '', array $headers = [])
-    {
-        return response(
-            $this->processContent($content),
-            Response::HTTP_OK,
-            $headers
-        );
-    }
-
-
-    /**
-     * @param string $content
-     * @param array $headers
-     * @return Application|ResponseFactory|Response
-     */
-    private function created(string $content = '', array $headers = [])
+    private function created(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -58,7 +58,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function accepted(string $content = '', array $headers = [])
+    private function accepted(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -71,7 +71,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function noContent(array $headers = [])
+    private function noContent(array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             null,
@@ -85,7 +85,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function movedPermanently($newUrl, array $headers = [])
+    private function movedPermanently($newUrl, array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             null,
@@ -99,7 +99,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function found($url, array $headers = [])
+    private function found($url, array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             null,
@@ -113,7 +113,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function seeOther($newUrl, array $headers = [])
+    private function seeOther($newUrl, array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             null,
@@ -127,7 +127,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function temporaryRedirect($tempUrl, array $headers = [])
+    private function temporaryRedirect($tempUrl, array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             null,
@@ -141,7 +141,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function badRequest(string $content = '', array $headers = [])
+    private function badRequest(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -155,7 +155,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function unauthorized(string $content = '', array $headers = [])
+    private function unauthorized(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -169,7 +169,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function paymentRequired(string $content = '', array $headers = [])
+    private function paymentRequired(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -183,7 +183,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function forbidden(string $content = '', array $headers = [])
+    private function forbidden(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -197,7 +197,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function notFound(string $content = '', array $headers = [])
+    private function notFound(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -211,7 +211,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function methodNotAllowed(string $content = '', array $headers = [])
+    private function methodNotAllowed(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -225,7 +225,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function notAcceptable(string $content = '', array $headers = [])
+    private function notAcceptable(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -239,7 +239,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function gone(string $content = '', array $headers = [])
+    private function gone(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -253,7 +253,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function payloadTooLarge(string $content = '', array $headers = [])
+    private function payloadTooLarge(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -267,7 +267,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function unprocessableEntity(string $content = '', array $headers = [])
+    private function unprocessableEntity(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -281,7 +281,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function upgradeRequired(string $content = '', array $headers = [])
+    private function upgradeRequired(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -295,7 +295,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function tooManyRequests(string $content = '', array $headers = [])
+    private function tooManyRequests(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -309,7 +309,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function internalServerError(string $content = '', array $headers = [])
+    private function internalServerError(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -323,7 +323,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function notImplemented(string $content = '', array $headers = [])
+    private function notImplemented(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -337,7 +337,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function badGateway(string $content = '', array $headers = [])
+    private function badGateway(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -351,7 +351,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function serviceUnavailable(string $content = '', array $headers = [])
+    private function serviceUnavailable(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -365,7 +365,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function gatewayTimeout(string $content = '', array $headers = [])
+    private function gatewayTimeout(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
@@ -379,7 +379,7 @@ trait ResponseHTTPStatus
      * @param array $headers
      * @return Application|ResponseFactory|Response
      */
-    private function insufficientStorage(string $content = '', array $headers = [])
+    private function insufficientStorage(string $content = '', array $headers = []): Response|Application|ResponseFactory
     {
         return response(
             $this->processContent($content),
